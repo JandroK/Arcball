@@ -130,7 +130,7 @@ if xmouse > xlim(1) && xmouse < xlim(2) && ymouse > ylim(1) && ymouse < ylim(2)
     % Calculate actual quaternion
     qk = MultQuaternion(dq,q0);
     % Transform and publish differents attitudes
-    
+    UpdateAttitudes(qk, handles);
     % Redraw Cube
     handles.Cube = RedrawCube(qk,handles.Cube);
     % Save actual data
@@ -578,6 +578,29 @@ end
 
 
 %% Functions
+
+function UpdateAttitudes(q, handles)
+% Set Quaternion
+SetQuaternion();
+% Set Euler principal Angles and axis
+SetEulerPrincipalAngles();
+% Set Euler Angles
+SetEulerAngles();
+% Set Rotation Vector
+SetRotationVector();
+% Set Rotation Matrix 
+SetRotationMatrix();
+
+function SetQuaternion()
+
+function SetEulerPrincipalAngles()
+
+function SetEulerAngles()
+
+function SetRotationVector()
+
+function SetRotationMatrix()
+
 % Convert a 2d point to 3d 
 function m = Map2DPointsTo3D(x,y)
 r = sqrt(3);

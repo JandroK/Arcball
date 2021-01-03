@@ -22,7 +22,7 @@ function varargout = trackBall(varargin)
 
 % Edit the above text to modify the response to help trackBall
 
-% Last Modified by GUIDE v2.5 02-Jan-2021 11:49:56
+% Last Modified by GUIDE v2.5 03-Jan-2021 21:16:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,6 +59,7 @@ axes(handles.axes1);
 
 handles.Cube=DrawCube();
 
+handles.q0 = [1;0;0;0];
 set(handles.axes1,'CameraPosition',...
     [0 0 5],'CameraTarget',...
     [0 0 -5],'CameraUpVector',...
@@ -97,7 +98,7 @@ xmouse = mousepos(1,1);
 ymouse = mousepos(1,2);
 
 if xmouse > xlim(1) && xmouse < xlim(2) && ymouse > ylim(1) && ymouse < ylim(2)
-
+    handles.m0 = Map2DPointsTo3D(xmouse, ymouse);
     set(handles.figure1,'WindowButtonMotionFcn',{@my_MouseMoveFcn,hObject});
 end
 guidata(hObject,handles)
@@ -117,10 +118,24 @@ xmouse = mousepos(1,1);
 ymouse = mousepos(1,2);
 
 if xmouse > xlim(1) && xmouse < xlim(2) && ymouse > ylim(1) && ymouse < ylim(2)
-
-    Map2DPointsTo3D();
-    q = [1;0;0;0];
-    handles.Cube = RedrawCube(q,handles.Cube);
+    
+    % Calculate m1
+    m1 = Map2DPointsTo3D(xmouse,ymouse);
+    % Get past info
+    m0 = handles.m0;
+    q0 = handles.q0;
+    % Calculate delta quaternoin
+    dq = QuaternionFromTwoVectors(m0,m1);
+    dq = dq/norm(dq);
+    % Calculate actual quaternion
+    qk = MultQuaternion(dq,q0);
+    % Transform and publish differents attitudes
+    UpdateAttitudes(qk, handles);
+    % Redraw Cube
+    handles.Cube = RedrawCube(qk,handles.Cube);
+    % Save actual data
+    handles.m0 = m1;
+    handles.q0 = qk;
     
 end
 guidata(hObject,handles);
@@ -153,7 +168,7 @@ y = reshape(y(con(:)),[4,6]);
 z = reshape(z(con(:)),[4,6]);
 
 c = 1/255*[255 248 88;
-    0 0 0;
+    255 255 255;
     57 183 225;
     57 183 0;
     255 178 0;
@@ -169,7 +184,7 @@ function h = RedrawCube(q,hin)
 
 h = hin;
 c = 1/255*[255 248 88;
-    0 0 0;
+    255 255 255;
     57 183 225;
     57 183 0;
     255 178 0;
@@ -185,7 +200,10 @@ M = [-1 -1  1;  %Node 1
       1 -1 -1]; %Node 8
 
 %% TODO rotate M by using q
-
+% Calculate rotation matrix
+R = RotationMatrix(q);
+% Rotate Cube
+M=(R*M')';
 
 x = M(:,1);
 y = M(:,2);
@@ -560,15 +578,24 @@ end
 
 
 %% Functions
+
+function UpdateAttitudes(q, handles)
+% Set Quaternion
+
+%Set Euler principal Angles and axis
+
+%Euler Angles
+
+
 % Convert a 2d point to 3d 
 function m = Map2DPointsTo3D(x,y)
 r = sqrt(3);
 
-if x*x+y*y<0.5*r*r
-    z = sqrt(r*r-(x*x)-(y*y)); 
+if x*x+y*y < 0.5*r*r
+    z = abs(sqrt(r*r-(x*x)-(y*y))); 
 else
     z = (r*r)/(2*sqrt(x*x+y*y));
-    modulePoint = norm(x,y,z); 
+    modulePoint = norm([x;y;z]); 
     x = r*x/modulePoint;
     y = r*y/modulePoint;
     z = r*z/modulePoint;
@@ -582,7 +609,7 @@ w = (1 / m) * cross(u, v);
 q =[0.5 * m; w(1); w(2); w(3)];
 
 % Multiply two quaternions
-function w = MultQuaternion (q,v)
+function w = MultQuaternion(q,v)
 q0=q(1);
 v0=v(1);
 qv=q(2:4);
@@ -602,3 +629,102 @@ c=2*q(1)*qx;
 
 R= a+b+c;
 
+% --- Executes on button press in ResetCube.
+function ResetCube_Callback(hObject, eventdata, handles)
+% hObject    handle to ResetCube (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.m0 = [0;0;0];
+handles.q0 = [1;0;0;0];
+
+handles.Cube = RedrawCube(handles.q0,handles.Cube);
+guidata(hObject, handles);
+
+function R = Eaa2rotMat(a,u)
+% [R] = Eaa2rotMat(a,u)
+% Computes the rotation matrix R given an angle and axis of rotation. 
+% Inputs:
+%	a: angle of rotation
+%	u: axis of rotation 
+% Outputs:
+%	R: generated rotation matrix
+n=norm(u);
+Uu=(u/n);
+I = eye(3);
+Ux=[0,-Uu(3),Uu(2);Uu(3),0,-Uu(1);-Uu(2),Uu(1),0];
+R=I*cosd(a)+(1-cosd(a))*(Uu*Uu')+Ux*sind(a);
+
+function R = eAngles2rotM(yaw, pitch, roll)
+% [R] = eAngles2rotM(yaw, pitch, roll)
+% Computes the rotation matrix R given the Euler angles (yaw, pitch, roll). 
+% Inputs:
+%	yaw: angle of rotation around the z axis
+%	pitch: angle of rotation around the y axis
+%	roll: angle of rotation around the x axis
+% Outputs:
+%	R: rotation matrix
+Ryaw=[cosd(yaw),sind(yaw),0;-sind(yaw),cosd(yaw),0;0,0,1];
+Rpitch=[cosd(pitch),0,-sind(pitch);0,1,0;sind(pitch),0,cosd(pitch)];
+Rroll=[1,0,0;0,cosd(roll),sind(roll);0,-sind(roll),cosd(roll)];
+R=Ryaw'*Rpitch'*Rroll';
+
+
+function [yaw, pitch, roll] = rotM2eAngles(R)
+% [yaw, pitch, roll] = rotM2eAngles(R)
+% Computes the Euler angles (yaw, pitch, roll) given an input rotation matrix R.
+% Inputs:
+%	R: rotation matrix
+% Outputs:
+%	yaw: angle of rotation around the z axis
+%	pitch: angle of rotation around the y axis
+%	roll: angle of rotation around the x axis
+pitch=asind(-R(3,1));
+if sind(pitch)==1
+    roll=acosd(R(2,2));
+    yaw=0;
+
+elseif sind(pitch)==-1
+    roll=acosd(R(2,2));
+    yaw=0;
+
+else
+    roll=asind(R(3,2)/cosd(pitch));
+    yaw=asind(R(2,1)/cosd(pitch));
+end
+
+function [a,u] = rotMat2Eaa(R)
+% [a,u] = rotMat2Eaa(R)
+% Computes the angle and principal axis of rotation given a rotation matrix R. 
+% Inputs:
+%	R: rotation matrix
+% Outputs:
+%	a: angle of rotation
+%	u: axis of rotation 
+
+a=acosd((trace(R)-1)/2);
+if a==0
+    u=rand(3,1);
+
+elseif a==180
+    M=(R+eye(3))/2;
+    if (M(1,1))~= 0
+        u(1)=sqrt(M(1,1));
+        u(2)=M(1,2)/u(1);
+        u(3)=M(1,3)/u(1);
+
+    elseif (M(2,2))~= 0
+        u(2)=sqrt(M(2,2));
+        u(1)=M(2,1)/u(2);
+        u(3)=M(2,3)/u(2);
+
+    elseif (M(3,3))~= 0
+        u(3)=sqrt(M(3,3));
+        u(1)=M(3,1)/u(3);
+        u(3)=M(3,2)/u(3);
+    end
+else
+    Ux=(R-R')/(2*sind(a));
+    u(1)=Ux(3,2);
+    u(2)=Ux(1,3);
+    u(3)=Ux(2,1);
+end
