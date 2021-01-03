@@ -22,7 +22,7 @@ function varargout = trackBall(varargin)
 
 % Edit the above text to modify the response to help trackBall
 
-% Last Modified by GUIDE v2.5 03-Jan-2021 22:17:59
+% Last Modified by GUIDE v2.5 03-Jan-2021 23:24:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -507,20 +507,18 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
-function euler_roll_Callback(hObject, eventdata, handles)
-% hObject    handle to euler_roll (see GCBO)
+function roll_Callback(hObject, eventdata, handles)
+% hObject    handle to roll (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of euler_roll as text
-%        str2double(get(hObject,'String')) returns contents of euler_roll as a double
+% Hints: get(hObject,'String') returns contents of roll as text
+%        str2double(get(hObject,'String')) returns contents of roll as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function euler_roll_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to euler_roll (see GCBO)
+function roll_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to roll (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -532,18 +530,18 @@ end
 
 
 
-function euler_pitch_Callback(hObject, eventdata, handles)
-% hObject    handle to euler_pitch (see GCBO)
+function pitch_Callback(hObject, eventdata, handles)
+% hObject    handle to pitch (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of euler_pitch as text
-%        str2double(get(hObject,'String')) returns contents of euler_pitch as a double
+% Hints: get(hObject,'String') returns contents of pitch as text
+%        str2double(get(hObject,'String')) returns contents of pitch as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function euler_pitch_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to euler_pitch (see GCBO)
+function pitch_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to pitch (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -553,20 +551,18 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
-function euler_yaw_Callback(hObject, eventdata, handles)
-% hObject    handle to euler_yaw (see GCBO)
+function yaw_Callback(hObject, eventdata, handles)
+% hObject    handle to yaw (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of euler_yaw as text
-%        str2double(get(hObject,'String')) returns contents of euler_yaw as a double
+% Hints: get(hObject,'String') returns contents of yaw as text
+%        str2double(get(hObject,'String')) returns contents of yaw as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function euler_yaw_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to euler_yaw (see GCBO)
+function yaw_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to yaw (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -586,27 +582,32 @@ set(handles.q1,'String', num2str(q(2)));
 set(handles.q2,'String', num2str(q(3)));
 set(handles.q3,'String', num2str(q(4)));
 % Set Euler principal Angles and axis
-SetEulerPrincipalAngles();
+
 % Set Euler Angles
-SetEulerAngles();
+
 % Set Rotation Vector
-SetRotationVector();
+
 % Set Rotation Matrix 
-SetRotationMatrix();
+R = RotationMatrix(q);
+set(handles.m1,'String',num2str(R(1,1)));
+set(handles.m2,'String',num2str(R(1,2)));
+set(handles.m3,'String',num2str(R(1,3)));
+set(handles.m4,'String',num2str(R(2,1)));
+set(handles.m5,'String',num2str(R(2,2)));
+set(handles.m6,'String',num2str(R(2,3)));
+set(handles.m7,'String',num2str(R(3,1)));
+set(handles.m8,'String',num2str(R(3,2)));
+set(handles.m9,'String',num2str(R(3,3)));
 
-function SetQuaternion(q)
-%set(handles.q0_0,'String', num2str(q(1)));
-set(handles.q1,'String', num2str(q(2)));
-set(handles.q2,'String', num2str(q(3)));
-set(handles.q3,'String', num2str(q(4)));
+%function SetQuaternion()
 
-function SetEulerPrincipalAngles()
+%function SetEulerPrincipalAngles()
 
-function SetEulerAngles()
+%function SetEulerAngles()
 
-function SetRotationVector()
+%function SetRotationVector()
 
-function SetRotationMatrix()
+%function SetRotationMatrix()
 
 % Convert a 2d point to 3d 
 function m = Map2DPointsTo3D(x,y)
@@ -749,142 +750,4 @@ else
     u(1)=Ux(3,2);
     u(2)=Ux(1,3);
     u(3)=Ux(2,1);
-end
-
-
-
-function edit23_Callback(hObject, eventdata, handles)
-% hObject    handle to q1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of q1 as text
-%        str2double(get(hObject,'String')) returns contents of q1 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit23_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to q1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit24_Callback(hObject, eventdata, handles)
-% hObject    handle to q2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of q2 as text
-%        str2double(get(hObject,'String')) returns contents of q2 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit24_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to q2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit25_Callback(hObject, eventdata, handles)
-% hObject    handle to q3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of q3 as text
-%        str2double(get(hObject,'String')) returns contents of q3 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit25_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to q3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function roll_Callback(hObject, eventdata, handles)
-% hObject    handle to roll (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of roll as text
-%        str2double(get(hObject,'String')) returns contents of roll as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function roll_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to roll (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function pitch_Callback(hObject, eventdata, handles)
-% hObject    handle to pitch (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of pitch as text
-%        str2double(get(hObject,'String')) returns contents of pitch as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function pitch_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to pitch (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function yaw_Callback(hObject, eventdata, handles)
-% hObject    handle to yaw (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of yaw as text
-%        str2double(get(hObject,'String')) returns contents of yaw as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function yaw_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to yaw (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
 end
