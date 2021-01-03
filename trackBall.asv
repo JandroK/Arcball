@@ -22,7 +22,7 @@ function varargout = trackBall(varargin)
 
 % Edit the above text to modify the response to help trackBall
 
-% Last Modified by GUIDE v2.5 03-Jan-2021 20:56:59
+% Last Modified by GUIDE v2.5 02-Jan-2021 11:49:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,6 @@ axes(handles.axes1);
 
 handles.Cube=DrawCube();
 
-handles.q0 = [1;0;0;0];
 set(handles.axes1,'CameraPosition',...
     [0 0 5],'CameraTarget',...
     [0 0 -5],'CameraUpVector',...
@@ -98,7 +97,7 @@ xmouse = mousepos(1,1);
 ymouse = mousepos(1,2);
 
 if xmouse > xlim(1) && xmouse < xlim(2) && ymouse > ylim(1) && ymouse < ylim(2)
-    handles.m0 = Map2DPointsTo3D(xmouse, ymouse);
+
     set(handles.figure1,'WindowButtonMotionFcn',{@my_MouseMoveFcn,hObject});
 end
 guidata(hObject,handles)
@@ -118,24 +117,10 @@ xmouse = mousepos(1,1);
 ymouse = mousepos(1,2);
 
 if xmouse > xlim(1) && xmouse < xlim(2) && ymouse > ylim(1) && ymouse < ylim(2)
-    
-    % Calculate m1
-    m1 = Map2DPointsTo3D(xmouse,ymouse);
-    % Get past info
-    m0 = handles.m0;
-    q0 = handles.q0;
-    % Calculate delta quaternoin
-    dq = QuaternionFromTwoVectors(m0,m1);
-    dq = dq/norm(dq);
-    % Calculate actual quaternion
-    qk = MultQuaternion(dq,q0);
-    % Transform and publish differents attitudes
-    
-    % Redraw Cube
-    handles.Cube = RedrawCube(qk,handles.Cube);
-    % Save actual data
-    handles.m0 = m1;
-    handles.q0 = qk;
+
+    Map2DPointsTo3D();
+    q = [1;0;0;0];
+    handles.Cube = RedrawCube(q,handles.Cube);
     
 end
 guidata(hObject,handles);
@@ -168,7 +153,7 @@ y = reshape(y(con(:)),[4,6]);
 z = reshape(z(con(:)),[4,6]);
 
 c = 1/255*[255 248 88;
-    255 255 255;
+    0 0 0;
     57 183 225;
     57 183 0;
     255 178 0;
@@ -184,7 +169,7 @@ function h = RedrawCube(q,hin)
 
 h = hin;
 c = 1/255*[255 248 88;
-    255 255 255;
+    0 0 0;
     57 183 225;
     57 183 0;
     255 178 0;
@@ -200,10 +185,7 @@ M = [-1 -1  1;  %Node 1
       1 -1 -1]; %Node 8
 
 %% TODO rotate M by using q
-% Calculate rotation matrix
-R = RotationMatrix(q);
-% Rotate Cube
-M=(R*M')';
+
 
 x = M(:,1);
 y = M(:,2);
@@ -582,11 +564,11 @@ end
 function m = Map2DPointsTo3D(x,y)
 r = sqrt(3);
 
-if x*x+y*y < 0.5*r*r
-    z = abs(sqrt(r*r-(x*x)-(y*y))); 
+if x*x+y*y<0.5*r*r
+    z = sqrt(r*r-(x*x)-(y*y)); 
 else
     z = (r*r)/(2*sqrt(x*x+y*y));
-    modulePoint = norm([x;y;z]); 
+    modulePoint = norm(x,y,z); 
     x = r*x/modulePoint;
     y = r*y/modulePoint;
     z = r*z/modulePoint;
@@ -600,7 +582,7 @@ w = (1 / m) * cross(u, v);
 q =[0.5 * m; w(1); w(2); w(3)];
 
 % Multiply two quaternions
-function w = MultQuaternion(q,v)
+function w = MultQuaternion (q,v)
 q0=q(1);
 v0=v(1);
 qv=q(2:4);
@@ -620,13 +602,3 @@ c=2*q(1)*qx;
 
 R= a+b+c;
 
-% --- Executes on button press in ResetCube.
-function ResetCube_Callback(hObject, eventdata, handles)
-% hObject    handle to ResetCube (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-handles.m0 = [0;0;0];
-handles.q0 = [1;0;0;0];
-
-handles.Cube = RedrawCube(handles.q0,handles.Cube);
-guidata(hObject, handles);
