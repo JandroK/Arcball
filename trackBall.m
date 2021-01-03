@@ -576,19 +576,25 @@ end
 %% Functions
 
 function UpdateAttitudes(q, handles)
+R = RotationMatrix(q);
 % Set Quaternion
 set(handles.q0_0,'String', num2str(q(1)));
 set(handles.q1,'String', num2str(q(2)));
 set(handles.q2,'String', num2str(q(3)));
 set(handles.q3,'String', num2str(q(4)));
+
 % Set Euler principal Angles and axis
+[angle,u]=rotMat2Eaa(R);
+set(handles.euler_x,'String', num2str(u(1)));
+set(handles.euler_y,'String', num2str(u(2)));
+set(handles.euler_z,'String', num2str(u(3)));
+set(handles.euler_angle,'String', num2str(angle));
 
 % Set Euler Angles
 
 % Set Rotation Vector
 
 % Set Rotation Matrix 
-R = RotationMatrix(q);
 set(handles.m1,'String',num2str(R(1,1)));
 set(handles.m2,'String',num2str(R(1,2)));
 set(handles.m3,'String',num2str(R(1,3)));
@@ -726,7 +732,7 @@ function [a,u] = rotMat2Eaa(R)
 
 a=acosd((trace(R)-1)/2);
 if a==0
-    u=rand(3,1);
+    u=zeros(3,1);
 
 elseif a==180
     M=(R+eye(3))/2;
