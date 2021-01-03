@@ -584,14 +584,17 @@ set(handles.q2,'String', num2str(q(3)));
 set(handles.q3,'String', num2str(q(4)));
 
 % Set Euler principal Angles and axis
-[angle,u]=rotMat2Eaa(R);
+[angle,u] = rotMat2Eaa(R);
 set(handles.euler_x,'String', num2str(u(1)));
 set(handles.euler_y,'String', num2str(u(2)));
 set(handles.euler_z,'String', num2str(u(3)));
 set(handles.euler_angle,'String', num2str(angle));
 
 % Set Euler Angles
-
+[roll,pitch,yaw] = rotM2eAngles(R);
+set(handles.roll,'String', num2str(roll));
+set(handles.pitch,'String', num2str(pitch));
+set(handles.yaw,'String', num2str(yaw));
 
 % Set Rotation Vector
 vec = u*angle;

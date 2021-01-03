@@ -22,7 +22,7 @@ function varargout = trackBall(varargin)
 
 % Edit the above text to modify the response to help trackBall
 
-% Last Modified by GUIDE v2.5 03-Jan-2021 23:24:51
+% Last Modified by GUIDE v2.5 04-Jan-2021 00:38:17
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -440,18 +440,18 @@ function UpdateRotationVector_Callback(hObject, eventdata, handles)
 
 
 
-function u1_Callback(hObject, eventdata, handles)
-% hObject    handle to u1 (see GCBO)
+function v1_Callback(hObject, eventdata, handles)
+% hObject    handle to v1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of u1 as text
-%        str2double(get(hObject,'String')) returns contents of u1 as a double
+% Hints: get(hObject,'String') returns contents of v1 as text
+%        str2double(get(hObject,'String')) returns contents of v1 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function u1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to u1 (see GCBO)
+function v1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to v1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -463,18 +463,18 @@ end
 
 
 
-function u2_Callback(hObject, eventdata, handles)
-% hObject    handle to u2 (see GCBO)
+function v2_Callback(hObject, eventdata, handles)
+% hObject    handle to v2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of u2 as text
-%        str2double(get(hObject,'String')) returns contents of u2 as a double
+% Hints: get(hObject,'String') returns contents of v2 as text
+%        str2double(get(hObject,'String')) returns contents of v2 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function u2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to u2 (see GCBO)
+function v2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to v2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -486,18 +486,18 @@ end
 
 
 
-function u3_Callback(hObject, eventdata, handles)
-% hObject    handle to u3 (see GCBO)
+function v3_Callback(hObject, eventdata, handles)
+% hObject    handle to v3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of u3 as text
-%        str2double(get(hObject,'String')) returns contents of u3 as a double
+% Hints: get(hObject,'String') returns contents of v3 as text
+%        str2double(get(hObject,'String')) returns contents of v3 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function u3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to u3 (see GCBO)
+function v3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to v3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -584,20 +584,21 @@ set(handles.q2,'String', num2str(q(3)));
 set(handles.q3,'String', num2str(q(4)));
 
 % Set Euler principal Angles and axis
-[angle,u]=rotMat2Eaa(R);
+[angle,u] = rotMat2Eaa(R);
 set(handles.euler_x,'String', num2str(u(1)));
 set(handles.euler_y,'String', num2str(u(2)));
 set(handles.euler_z,'String', num2str(u(3)));
 set(handles.euler_angle,'String', num2str(angle));
 
 % Set Euler Angles
-
+[roll,pitch,yaw] = rotM2eAngles(R);
 
 % Set Rotation Vector
+vec = u*angle;
+set(handles.v1,'String', num2str(vec(1)));
+set(handles.v2,'String', num2str(vec(2)));
+set(handles.v3,'String', num2str(vec(3)));
 
-set(handles.u1,'String', num2str(u(1)));
-set(handles.u2,'String', num2str(u(2)));
-set(handles.u3,'String', num2str(u(3)));
 
 % Set Rotation Matrix 
 set(handles.m1,'String',num2str(R(1,1)));
