@@ -22,7 +22,7 @@ function varargout = trackBall(varargin)
 
 % Edit the above text to modify the response to help trackBall
 
-% Last Modified by GUIDE v2.5 03-Jan-2021 20:56:59
+% Last Modified by GUIDE v2.5 03-Jan-2021 21:16:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -630,3 +630,92 @@ handles.q0 = [1;0;0;0];
 
 handles.Cube = RedrawCube(handles.q0,handles.Cube);
 guidata(hObject, handles);
+
+function R = Eaa2rotMat(a,u)
+% [R] = Eaa2rotMat(a,u)
+% Computes the rotation matrix R given an angle and axis of rotation. 
+% Inputs:
+%	a: angle of rotation
+%	u: axis of rotation 
+% Outputs:
+%	R: generated rotation matrix
+n=norm(u);
+Uu=(u/n);
+I = eye(3);
+Ux=[0,-Uu(3),Uu(2);Uu(3),0,-Uu(1);-Uu(2),Uu(1),0];
+R=I*cosd(a)+(1-cosd(a))*(Uu*Uu')+Ux*sind(a);
+
+function R = eAngles2rotM(yaw, pitch, roll)
+% [R] = eAngles2rotM(yaw, pitch, roll)
+% Computes the rotation matrix R given the Euler angles (yaw, pitch, roll). 
+% Inputs:
+%	yaw: angle of rotation around the z axis
+%	pitch: angle of rotation around the y axis
+%	roll: angle of rotation around the x axis
+% Outputs:
+%	R: rotation matrix
+Ryaw=[cosd(yaw),sind(yaw),0;-sind(yaw),cosd(yaw),0;0,0,1];
+Rpitch=[cosd(pitch),0,-sind(pitch);0,1,0;sind(pitch),0,cosd(pitch)];
+Rroll=[1,0,0;0,cosd(roll),sind(roll);0,-sind(roll),cosd(roll)];
+R=Ryaw'*Rpitch'*Rroll';
+
+
+function [yaw, pitch, roll] = rotM2eAngles(R)
+% [yaw, pitch, roll] = rotM2eAngles(R)
+% Computes the Euler angles (yaw, pitch, roll) given an input rotation matrix R.
+% Inputs:
+%	R: rotation matrix
+% Outputs:
+%	yaw: angle of rotation around the z axis
+%	pitch: angle of rotation around the y axis
+%	roll: angle of rotation around the x axis
+pitch=asind(-R(3,1));
+if sind(pitch)==1
+    roll=acosd(R(2,2));
+    yaw=0;
+
+elseif sind(pitch)==-1
+    roll=acosd(R(2,2));
+    yaw=0;
+
+else
+    roll=asind(R(3,2)/cosd(pitch));
+    yaw=asind(R(2,1)/cosd(pitch));
+end
+
+function [a,u] = rotMat2Eaa(R)
+% [a,u] = rotMat2Eaa(R)
+% Computes the angle and principal axis of rotation given a rotation matrix R. 
+% Inputs:
+%	R: rotation matrix
+% Outputs:
+%	a: angle of rotation
+%	u: axis of rotation 
+
+a=acosd((trace(R)-1)/2);
+if a==0
+    u=rand(3,1);
+
+elseif a==180
+    M=(R+eye(3))/2;
+    if (M(1,1))~= 0
+        u(1)=sqrt(M(1,1));
+        u(2)=M(1,2)/u(1);
+        u(3)=M(1,3)/u(1);
+
+    elseif (M(2,2))~= 0
+        u(2)=sqrt(M(2,2));
+        u(1)=M(2,1)/u(2);
+        u(3)=M(2,3)/u(2);
+
+    elseif (M(3,3))~= 0
+        u(3)=sqrt(M(3,3));
+        u(1)=M(3,1)/u(3);
+        u(3)=M(3,2)/u(3);
+    end
+else
+    Ux=(R-R')/(2*sind(a));
+    u(1)=Ux(3,2);
+    u(2)=Ux(1,3);
+    u(3)=Ux(2,1);
+end
