@@ -708,15 +708,15 @@ w = (1 / m) * cross(u, v);
 q =[0.5 * m; w(1); w(2); w(3)];
 
 % Multiply two quaternions
-function w = MultQuaternion(q,p)
+function w = MultQuaternion(q,v)
 q0=q(1);
-p0=p(1);
+v0=v(1);
 qv=q(2:4);
-pv=p(2:4);
+vv=v(2:4);
 
 w=zeros(4,1);
-w(1)=q0*p0-(qv'*pv);
-w(2:4)=q0*pv +p0*qv +cross(qv,pv);
+w(1)=q0*v0-(qv'*vv);
+w(2:4)=q0*vv +v0*qv +cross(qv,vv);
 
 function R = RotationMatrix(q)
 if q(1)==1
@@ -728,6 +728,7 @@ else
     b=2*(qv*qv');
     c=2*q(1)*qx;
     R= a+b+c;
+    R=R/norm(R);
 end
 
 function q = RotationMatrix2Quaternion(R)
