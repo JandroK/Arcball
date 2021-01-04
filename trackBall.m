@@ -456,6 +456,21 @@ function UpdateRotationVector_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+%Rotation Vector
+v1 = str2double(get(handles.v1, 'String'));
+v2 = str2double(get(handles.v2, 'String'));
+v3 = str2double(get(handles.v3, 'String'));
+vr = [v1, v2, v3]';
+
+%Euler angle axis
+u = vr/norm(vr);
+a = norm(vr);
+if norm(vr) == 0
+    u = [1;0;0];
+end
+q = [cosd(a/2); sind(a/2) * u];
+q=q/norm(q);
+handles.q0=q;
 % Transform and publish differents attitudes
 UpdateAttitudes(q, handles);
 % Redraw Cube
