@@ -437,11 +437,15 @@ function UpdateAngleAxis_Callback(hObject, eventdata, handles)
 u(1) = str2double(get(handles.euler_x, 'String'));
 u(2) = str2double(get(handles.euler_y, 'String'));
 u(3) = str2double(get(handles.euler_z, 'String'));
-angle(4) = str2double(get(handles.euler_angle, 'String'));
+angle = str2double(get(handles.euler_angle, 'String'));
+u = u/norm(u);
+u=u';
 
 R = Eaa2rotMat(angle,u);
-
-
+q = RotationMatrix2Quaternion(R);
+q = q/norm(q);
+q=q';
+handles.q0=q;
 % Transform and publish differents attitudes
 UpdateAttitudes(q, handles);
 % Redraw Cube
@@ -456,9 +460,12 @@ function UpdateEulerAngles_Callback(hObject, eventdata, handles)
 roll = str2double(get(handles.roll, 'String'));
 pitch = str2double(get(handles.pitch, 'String'));
 yaw = str2double(get(handles.yaw, 'String'));
-R = eAngles2rotM(roll,pitch,yaw);
-%q = RotationMatrix2Quaternion(R);
 
+R = eAngles2rotM(roll,pitch,yaw);
+q = RotationMatrix2Quaternion(R);
+q = q/norm(q);
+q=q';
+handles.q0=q;
 % Transform and publish differents attitudes
 UpdateAttitudes(q, handles);
 % Redraw Cube
@@ -471,17 +478,20 @@ function UpdateRotationVector_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 %Rotation Vector
-v1 = str2double(get(handles.v1, 'String'));
-v2 = str2double(get(handles.v2, 'String'));
-v3 = str2double(get(handles.v3, 'String'));
-vr = [v1, v2, v3]';
+vr(1) = str2double(get(handles.v1, 'String'));
+vr(2) = str2double(get(handles.v2, 'String'));
+vr(3) = str2double(get(handles.v3, 'String'));
+vr = vr';
 
 %Euler angle axis
-u = vr/norm(vr);
 a = norm(vr);
+
 if norm(vr) == 0
     u = [1;0;0];
+else
+    u = vr/norm(vr);
 end
+
 q = [cosd(a/2); sind(a/2) * u];
 q=q/norm(q);
 handles.q0=q;
@@ -710,11 +720,16 @@ function R = RotationMatrix(q)
 qv=q(2:4);
 qx = [0, -qv(3), qv(2); qv(3), 0, -qv(1); -qv(2), qv(1), 0];
 
-a=(q(1)*q(1)-qv'*qv)*eye(3);
-b=2*qv*qv';
-c=2*q(1)*qx;
-
-R= a+b+c;
+if q(1)==1
+    R=eye(3);
+else
+    a=((q(1)*q(1))-(qv'*qv));
+    a=a*eye(3);
+    b=2*(qv*qv');
+    c=2*q(1)*qx;
+    R= a+b+c;
+    R=R/norm(R);
+end
 
 function q = RotationMatrix2Quaternion(R)
 q(1) = sqrt((1+trace(R))/4);
@@ -796,11 +811,10 @@ function R = Eaa2rotMat(a,u)
 %	u: axis of rotation 
 % Outputs:
 %	R: generated rotation matrix
-n=norm(u);
-Uu=(u/n);
+u = u/norm(u);
 I = eye(3);
-Ux=[0,-Uu(3),Uu(2);Uu(3),0,-Uu(1);-Uu(2),Uu(1),0];
-R=I*cosd(a)+(1-cosd(a))*(Uu*Uu')+Ux*sind(a);
+Ux = [0,-u(3),u(2);u(3),0,-u(1);-u(2),u(1),0];
+R = I*cosd(a) + (1-cosd(a))*(u*u') + Ux*sind(a);
 
 function R = eAngles2rotM(yaw, pitch, roll)
 % [R] = eAngles2rotM(yaw, pitch, roll)
@@ -851,7 +865,7 @@ function [a,u] = rotMat2Eaa(R)
 
 a=acosd((trace(R)-1)/2);
 if a==0
-    u=zeros(3,1);
+    u=[1;0;0];
 
 elseif a==180
     M=(R+eye(3))/2;
