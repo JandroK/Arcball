@@ -817,7 +817,7 @@ Ux = [0,-u(3),u(2);u(3),0,-u(1);-u(2),u(1),0];
 R = I*cosd(a) + (1-cosd(a))*(u*u') + Ux*sind(a);
 
 function R = eAngles2rotM(roll, pitch, yaw)
-% [R] = eAngles2rotM(yaw, pitch, roll)
+% [R] = eAngles2rotM(roll, pitch, yaw)
 % Computes the rotation matrix R given the Euler angles (yaw, pitch, roll). 
 % Inputs:
 %	yaw: angle of rotation around the z axis
