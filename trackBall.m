@@ -226,15 +226,6 @@ for q = 1:6
     h(q).FaceColor = c(q,:);
 end
 
-
-% --- Executes on button press in UpdateQuaternion.
-function UpdateQuaternion_Callback(hObject, eventdata, handles)
-% hObject    handle to UpdateQuaternion (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
 function euler_x_Callback(hObject, eventdata, handles)
 % hObject    handle to euler_x (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -417,6 +408,25 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+% --- Executes on button press in UpdateQuaternion.
+function UpdateQuaternion_Callback(hObject, eventdata, handles)
+% hObject    handle to UpdateQuaternion (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+q(1) = str2double(get(handles.q0_0, 'String'));
+q(2) = str2double(get(handles.q1, 'String'));
+q(3) = str2double(get(handles.q2, 'String'));
+q(4) = str2double(get(handles.q3, 'String'));
+
+q=q';
+q=q/norm(q);
+handles.q0=q;
+
+% Transform and publish differents attitudes
+UpdateAttitudes(q, handles);
+% Redraw Cube
+handles.Cube = RedrawCube(q,handles.Cube);
 
 % --- Executes on button press in UpdateAngleAxis.
 function UpdateAngleAxis_Callback(hObject, eventdata, handles)
@@ -424,6 +434,10 @@ function UpdateAngleAxis_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Transform and publish differents attitudes
+UpdateAttitudes(q, handles);
+% Redraw Cube
+handles.Cube = RedrawCube(q,handles.Cube);
 
 % --- Executes on button press in UpdateEulerAngles.
 function UpdateEulerAngles_Callback(hObject, eventdata, handles)
@@ -431,6 +445,10 @@ function UpdateEulerAngles_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Transform and publish differents attitudes
+UpdateAttitudes(q, handles);
+% Redraw Cube
+handles.Cube = RedrawCube(q,handles.Cube);
 
 % --- Executes on button press in UpdateRotationVector.
 function UpdateRotationVector_Callback(hObject, eventdata, handles)
@@ -438,7 +456,10 @@ function UpdateRotationVector_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
+% Transform and publish differents attitudes
+UpdateAttitudes(q, handles);
+% Redraw Cube
+handles.Cube = RedrawCube(q,handles.Cube);
 
 function v1_Callback(hObject, eventdata, handles)
 % hObject    handle to v1 (see GCBO)
