@@ -717,12 +717,13 @@ w(1)=q0*v0-(qv'*vv);
 w(2:4)=q0*vv +v0*qv +cross(qv,vv);
 
 function R = RotationMatrix(q)
-qv=q(2:4);
-qx = [0, -qv(3), qv(2); qv(3), 0, -qv(1); -qv(2), qv(1), 0];
 
 if q(1)==1
     R=eye(3);
 else
+qv=q(2:4);
+qx = [0, -qv(3), qv(2); qv(3), 0, -qv(1); -qv(2), qv(1), 0];
+
     a=((q(1)*q(1))-(qv'*qv));
     a=a*eye(3);
     b=2*(qv*qv');
