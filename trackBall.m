@@ -434,6 +434,14 @@ function UpdateAngleAxis_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+u(1) = str2double(get(handles.euler_x, 'String'));
+u(2) = str2double(get(handles.euler_y, 'String'));
+u(3) = str2double(get(handles.euler_z, 'String'));
+angle(4) = str2double(get(handles.euler_angle, 'String'));
+
+R = Eaa2rotMat(angle,u);
+
+
 % Transform and publish differents attitudes
 UpdateAttitudes(q, handles);
 % Redraw Cube
@@ -686,6 +694,66 @@ b=2*qv*qv';
 c=2*q(1)*qx;
 
 R= a+b+c;
+
+function q = RotationMatrix2Quaternion(R)
+q(1) = sqrt((1+trace(R))/4);
+q(2) = sqrt((1-trace(R)+2*R(1,1))/4);
+q(3) = sqrt((1-trace(R)+2*R(2,2))/4);
+q(4) = sqrt((1-trace(R)+2*R(3,3))/4);
+
+ret=false;
+
+for i=2:4
+    if q(1)*q(1) > q(i)*q(i) && trace(R)>=0
+        q(1) = sqrt(1+R(1,1)+R(2,2)+R(3,3));
+        q(2) = (R(3,2)-R(2,3))/q(1);
+        q(3) = (R(1,3)-R(3,1))/q(1);
+        q(4) = (R(2,1)-R(1,2))/q(1);
+        ret=true;
+    end
+end
+
+if ret==false && trace(R)<0
+    qmax = max([R(1,1),R(2,2),R(3,3)]);
+    if R(1,1) == qmax
+      for i=1:4
+          if i==2
+              i=3;
+          end
+          if q(2)*q(2) > q(i)*q(i)
+              q(2) = sqrt(1+R(1,1)-R(2,2)-R(3,3));
+              q(1) = (R(3,2)-R(2,3))/q(2);
+              q(3) = (R(2,1)+R(1,2))/q(2);
+              q(4) = (R(1,3)+R(3,1))/q(2);              
+          end
+      end
+
+    elseif R(2,2) == qmax
+      for i=1:4
+          if i==3
+              i=4;
+          end
+          if q(3)*q(3) > q(i)*q(i)
+              q(3) = sqrt(1-R(1,1)+R(2,2)+R(3,3));
+              q(1) = (R(1,3)-R(3,1))/q(3);
+              q(2) = (R(2,1)+R(1,2))/q(3);
+              q(4) = (R(3,2)+R(2,3))/q(3);              
+          end
+      end
+
+    elseif R(3,3) == qmax
+      for i=1:3
+          if q(3)*q(3) > q(i)*q(i)
+              q(4) = sqrt(1-R(1,1)-R(2,2)+R(3,3));
+              q(1) = (R(2,1)-R(1,2))/q(4);
+              q(2) = (R(1,3)+R(3,1))/q(4);
+              q(3) = (R(3,2)+R(2,3))/q(4);              
+          end
+      end
+    end
+end
+q=0.5*q;
+
 
 % --- Executes on button press in ResetCube.
 function ResetCube_Callback(hObject, eventdata, handles)
