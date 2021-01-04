@@ -445,6 +445,12 @@ function UpdateEulerAngles_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+roll = str2double(get(handles.roll, 'String'));
+pitch = str2double(get(handles.pitch, 'String'));
+yaw = str2double(get(handles.yaw, 'String'));
+R = eAngles2rotM(roll,pitch,yaw);
+%q = RotationMatrix2Quaternion(R);
+
 % Transform and publish differents attitudes
 UpdateAttitudes(q, handles);
 % Redraw Cube
