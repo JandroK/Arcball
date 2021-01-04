@@ -674,16 +674,6 @@ set(handles.m7,'String',num2str(R(3,1)));
 set(handles.m8,'String',num2str(R(3,2)));
 set(handles.m9,'String',num2str(R(3,3)));
 
-%function SetQuaternion()
-
-%function SetEulerPrincipalAngles()
-
-%function SetEulerAngles()
-
-%function SetRotationVector()
-
-%function SetRotationMatrix()
-
 % Convert a 2d point to 3d 
 function m = Map2DPointsTo3D(x,y)
 r = sqrt(3);
@@ -723,12 +713,10 @@ qx = [0, -qv(3), qv(2); qv(3), 0, -qv(1); -qv(2), qv(1), 0];
 if q(1)==1
     R=eye(3);
 else
-    a=((q(1)*q(1))-(qv'*qv));
-    a=a*eye(3);
+    a=((q(1)*q(1))-(qv'*qv))*eye(3);
     b=2*(qv*qv');
     c=2*q(1)*qx;
     R= a+b+c;
-    R=R/norm(R);
 end
 
 function q = RotationMatrix2Quaternion(R)
