@@ -651,7 +651,7 @@ set(handles.euler_z,'String', num2str(u(3)));
 set(handles.euler_angle,'String', num2str(angle));
 
 % Set Euler Angles
-[roll,pitch,yaw] = rotM2eAngles(R);
+[yaw,pitch,roll] = rotM2eAngles(R);
 set(handles.roll,'String', num2str(roll));
 set(handles.pitch,'String', num2str(pitch));
 set(handles.yaw,'String', num2str(yaw));
@@ -816,7 +816,7 @@ I = eye(3);
 Ux = [0,-u(3),u(2);u(3),0,-u(1);-u(2),u(1),0];
 R = I*cosd(a) + (1-cosd(a))*(u*u') + Ux*sind(a);
 
-function R = eAngles2rotM(yaw, pitch, roll)
+function R = eAngles2rotM(roll, pitch, yaw)
 % [R] = eAngles2rotM(yaw, pitch, roll)
 % Computes the rotation matrix R given the Euler angles (yaw, pitch, roll). 
 % Inputs:
