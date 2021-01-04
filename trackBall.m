@@ -492,13 +492,25 @@ else
     u = vr/norm(vr);
 end
 
-q = [cosd(a/2); sind(a/2) * u];
+q = [cosd(a/2); sind(a/2) * u]; 
 q=q/norm(q);
 handles.q0=q;
 % Transform and publish differents attitudes
 UpdateAttitudes(q, handles);
 % Redraw Cube
 handles.Cube = RedrawCube(q,handles.Cube);
+
+% --- Executes on button press in ResetCube.
+function ResetCube_Callback(hObject, eventdata, handles)
+% hObject    handle to ResetCube (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.m0 = [0;0;0];
+handles.q0 = [1;0;0;0];
+
+UpdateAttitudes(handles.q0,handles);
+handles.Cube = RedrawCube(handles.q0,handles.Cube);
+guidata(hObject, handles);
 
 function v1_Callback(hObject, eventdata, handles)
 % hObject    handle to v1 (see GCBO)
@@ -707,12 +719,11 @@ w(1)=q0*p0-(qv'*pv);
 w(2:4)=q0*pv +p0*qv +cross(qv,pv);
 
 function R = RotationMatrix(q)
-qv=q(2:4);
-qx = [0, -qv(3), qv(2); qv(3), 0, -qv(1); -qv(2), qv(1), 0];
-
 if q(1)==1
     R=eye(3);
 else
+    qv=q(2:4);
+    qx = [0, -qv(3), qv(2); qv(3), 0, -qv(1); -qv(2), qv(1), 0];
     a=((q(1)*q(1))-(qv'*qv))*eye(3);
     b=2*(qv*qv');
     c=2*q(1)*qx;
@@ -777,19 +788,6 @@ if ret==false && trace(R)<0
     end
 end
 q=0.5*q;
-
-
-% --- Executes on button press in ResetCube.
-function ResetCube_Callback(hObject, eventdata, handles)
-% hObject    handle to ResetCube (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-handles.m0 = [0;0;0];
-handles.q0 = [1;0;0;0];
-
-UpdateAttitudes(handles.q0,handles);
-handles.Cube = RedrawCube(handles.q0,handles.Cube);
-guidata(hObject, handles);
 
 function R = Eaa2rotMat(a,u)
 % [R] = Eaa2rotMat(a,u)
