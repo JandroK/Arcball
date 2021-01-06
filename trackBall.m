@@ -142,14 +142,14 @@ guidata(hObject,handles);
 
 function h = DrawCube()
 
-M = [-1 -1  1;  %Node 1
-     -1  1  1;  %Node 2
-      1  1  1;  %Node 3
-      1 -1  1;  %Node 4
-     -1 -1 -1;  %Node 5
-     -1  1 -1;  %Node 6
-      1  1 -1;  %Node 7
-      1 -1 -1]; %Node 8
+M = [-2 -2  2;  %Node 1 suelo caraIzquierda caraDelantera
+      0  2  0;  %Node 2 caraIzquierda caraDelantera
+      0  2  0;  %Node 3 caraDerecha caraDelantera
+      2 -2  2;  %Node 4 suelo caraDerecha caraDelantera
+     -2 -2 -2;  %Node 5 suelo caraIzquierda caraTrasera
+      0  2  0;  %Node 6 caraIzquierda caraTrasera
+      0  2  0;  %Node 7 caraDerecha caraTrasera
+      2 -2 -2]; %Node 8 suelo caraDerecha caraTrasera
 
 x = M(:,1);
 y = M(:,2);
@@ -190,14 +190,14 @@ c = 1/255*[255 248 88;
     255 178 0;
     255 0 0];
 
-M = [-1 -1  1;  %Node 1
-     -1  1  1;  %Node 2
-      1  1  1;  %Node 3
-      1 -1  1;  %Node 4
-     -1 -1 -1;  %Node 5
-     -1  1 -1;  %Node 6
-      1  1 -1;  %Node 7
-      1 -1 -1]; %Node 8
+M = [-2 -2  2;  %Node 1 suelo caraIzquierda caraDelantera
+      0  2  0;  %Node 2 caraIzquierda caraDelantera
+      0  2  0;  %Node 3 caraDerecha caraDelantera
+      2 -2  2;  %Node 4 suelo caraDerecha caraDelantera
+     -2 -2 -2;  %Node 5 suelo caraIzquierda caraTrasera
+      0  2  0;  %Node 6 caraIzquierda caraTrasera
+      0  2  0;  %Node 7 caraDerecha caraTrasera
+      2 -2 -2]; %Node 8 suelo caraDerecha caraTrasera
 
 %% TODO rotate M by using q
 % Calculate rotation matrix
